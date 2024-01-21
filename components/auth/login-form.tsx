@@ -4,6 +4,7 @@ import React, { useTransition } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 import { LoginSchema } from "@/schemas";
 import {
@@ -23,13 +24,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
-  const [isPendition, setTransition] = useTransition();
+  const [isPending, setTransition] = useTransition();
   const [errorMessage, setError] = React.useState<string | undefined>("");
   const [successMessage, setSuccessMessage] = React.useState<
     string | undefined
   >("");
+  const [isText, setIsText] = React.useState<Boolean>(false);
+
+  const errorProviderMessage =
+    useSearchParams().get("error") === "OAuthAccountNotLinked"
+      ? "Email already exists, please login with your email and password"
+      : "";
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -69,6 +77,7 @@ const LoginForm = () => {
                       {...field}
                       placeholder="john.doe@example.com"
                       type="email"
+                      disabled={isPending}
                     ></Input>
                   </FormControl>
                   <FormMessage />
@@ -81,21 +90,44 @@ const LoginForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="******"
-                      type="password"
-                    ></Input>
-                  </FormControl>
+                  <div className="flex items-center relative">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="******"
+                        type={isText ? "text" : "password"}
+                        disabled={isPending}
+                      />
+                    </FormControl>
+                    <Button
+                      variant={"outline"}
+                      size={"icon"}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsText(!isText);
+                      }}
+                    >
+                      {isText ? (
+                        <IoEyeOffOutline
+                          className=" cursor-pointer"
+                          size={18}
+                        />
+                      ) : (
+                        <IoEyeOutline size={20} className="cursor-pointer" />
+                      )}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          {errorMessage && <FormError message={errorMessage} />}
+          {(errorMessage || errorProviderMessage) && (
+            <FormError message={errorMessage || errorProviderMessage} />
+          )}
           {successMessage && <FormSuccess message={successMessage} />}
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isPending}>
             Login
           </Button>
         </form>

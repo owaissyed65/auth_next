@@ -23,9 +23,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { register } from "@/actions/register";
 
 const RegisterForm = () => {
-  const [isPendition, setTransition] = useTransition();
+  const [isPending, setTransition] = useTransition();
   const [errorMessage, setError] = React.useState<string | undefined>("");
   const [successMessage, setSuccessMessage] = React.useState<
     string | undefined
@@ -43,12 +44,12 @@ const RegisterForm = () => {
   function onSubmit(values: z.infer<typeof RegisterSchema>) {
     setError("");
     setSuccessMessage("");
-    // setTransition(() => {
-    //   Login(values).then((res) => {
-    //     setError(res.error);
-    //     setSuccessMessage(res.success);
-    //   });
-    // });
+    setTransition(() => {
+      register(values).then((res) => {
+        setError(res.error);
+        setSuccessMessage(res.success);
+      });
+    });
   }
   return (
     <CardWrapper
@@ -67,7 +68,12 @@ const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="John" type="text"></Input>
+                    <Input
+                      {...field}
+                      placeholder="John"
+                      type="text"
+                      disabled={isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,6 +90,7 @@ const RegisterForm = () => {
                       {...field}
                       placeholder="john.doe@example.com"
                       type="email"
+                      disabled={isPending}
                     ></Input>
                   </FormControl>
                   <FormMessage />
@@ -102,6 +109,7 @@ const RegisterForm = () => {
                         {...field}
                         placeholder="******"
                         type={isText ? "text" : "password"}
+                        disabled={isPending}
                       />
                     </FormControl>
                     <Button
@@ -130,7 +138,7 @@ const RegisterForm = () => {
           </div>
           {errorMessage && <FormError message={errorMessage} />}
           {successMessage && <FormSuccess message={successMessage} />}
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isPending}>
             Create An Account
           </Button>
         </form>
