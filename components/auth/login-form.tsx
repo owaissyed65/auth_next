@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const LoginForm = () => {
   const [isPending, setTransition] = useTransition();
@@ -64,7 +65,7 @@ const LoginForm = () => {
       showSocialButton
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <div className="space-y-4">
             <FormField
               name="email"
@@ -118,6 +119,9 @@ const LoginForm = () => {
                       )}
                     </Button>
                   </div>
+                  <Button variant={"link"} asChild>
+                    <Link href={"/auth/reset"}>Forget Password</Link>
+                  </Button>
                   <FormMessage />
                 </FormItem>
               )}
